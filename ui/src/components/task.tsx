@@ -1,10 +1,11 @@
 import { Button, Checkbox, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
-import { UpdateTaskForm } from './update-task-form'
 import classNames from 'classnames'
 import axios from 'axios'
+import { UpdateTaskForm } from './update-task-form'
+import { TaskContext } from '../context'
 
 export type TaskProps = {
 	task: {
@@ -12,11 +13,13 @@ export type TaskProps = {
 		name: string
 		completed: boolean
 	}
-	fetchTasks: () => Promise<void>
 }
 
-export const Task = ({ task, fetchTasks }: TaskProps) => {
+export const Task = ({ task }: TaskProps) => {
 	const { id, name, completed } = task
+
+	const { deleteTask } = useContext(TaskContext)
+
 	const [isComplete, setIsComplete] = useState(completed)
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -35,9 +38,7 @@ export const Task = ({ task, fetchTasks }: TaskProps) => {
 
 	const handleDeleteTask = async () => {
 		try {
-			await axios.delete(`${import.meta.env.VITE_API_URL}/${id}`)
-
-			await fetchTasks()
+			await deleteTask(id)
 		} catch (error) {
 			console.error(error)
 		}
@@ -60,7 +61,6 @@ export const Task = ({ task, fetchTasks }: TaskProps) => {
 			</div>
 
 			<UpdateTaskForm
-				fetchTasks={fetchTasks}
 				isDialogOpen={isDialogOpen}
 				setIsDialogOpen={setIsDialogOpen}
 				task={task}

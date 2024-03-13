@@ -2,8 +2,8 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { AddTaskForm } from './components/add-task-form'
 import { Task } from './components/task'
-import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useContext } from 'react'
+import { TaskContext } from './context'
 
 const darkTheme = createTheme({
 	palette: {
@@ -18,27 +18,14 @@ type Task = {
 }
 
 export default function App() {
-	const [tasks, setTasks] = useState([])
-
-	const fetchTasks = async () => {
-		try {
-			const { data } = await axios.get(import.meta.env.VITE_API_URL)
-			setTasks(data)
-		} catch (error) {
-			console.error(error)
-		}
-	}
-
-	useEffect(() => {
-		fetchTasks()
-	}, [])
+	const { tasks } = useContext(TaskContext)
 
 	return (
 		<ThemeProvider theme={darkTheme}>
 			<CssBaseline />
-			<AddTaskForm fetchTasks={fetchTasks} />
-			{tasks.map((task: Task) => (
-				<Task key={task.id} task={task} fetchTasks={fetchTasks} />
+			<AddTaskForm />
+			{tasks.map((task) => (
+				<Task task={task} key={task.id} />
 			))}
 		</ThemeProvider>
 	)

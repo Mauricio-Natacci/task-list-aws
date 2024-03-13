@@ -1,24 +1,16 @@
 import { Button, Typography } from '@mui/material'
 import TextField from '@mui/material/TextField'
 import AddIcon from '@mui/icons-material/Add'
-import { useState } from 'react'
-import axios from 'axios'
+import { useContext, useState } from 'react'
+import { TaskContext } from '../context'
 
-type AddTaskFormProps = {
-	fetchTasks: () => Promise<void>
-}
-
-export const AddTaskForm = ({ fetchTasks }: AddTaskFormProps) => {
+export const AddTaskForm = () => {
 	const [newTask, setNewTask] = useState('')
+	const { addTask } = useContext(TaskContext)
 
 	const addNewTask = async () => {
 		try {
-			await axios.post(import.meta.env.VITE_API_URL, {
-				name: newTask,
-				completed: false,
-			})
-
-			await fetchTasks()
+			await addTask({ name: newTask, completed: false })
 
 			setNewTask('')
 		} catch (error) {

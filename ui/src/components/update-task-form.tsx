@@ -1,36 +1,32 @@
 import { Button, Dialog, DialogTitle, TextField } from '@mui/material'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import CheckIcon from '@mui/icons-material/Check'
 import { TaskProps } from './task'
-import axios from 'axios'
+import { TaskContext } from '../context'
 
 type UpdateTaskProps = {
 	isDialogOpen: boolean
 	setIsDialogOpen: (isDialogOpen: boolean) => void
 	task: TaskProps['task']
-	fetchTasks: () => Promise<void>
 }
 
 export const UpdateTaskForm = ({
 	isDialogOpen,
 	setIsDialogOpen,
 	task,
-	fetchTasks,
 }: UpdateTaskProps) => {
 	const { id, completed } = task
 	const [taskName, setTaskName] = useState('')
+
+	const { updateTask } = useContext(TaskContext)
 
 	const handleUpdateTaskName = async () => {
 		if (!taskName.length) return
 
 		try {
-			await axios.put(`${import.meta.env.VITE_API_URL}`, {
-				id,
-				name: taskName,
-				completed,
-			})
+			
+			await updateTask({ id, name: taskName, completed })
 
-			await fetchTasks()
 			setTaskName('')
 		} catch (error) {
 			console.error(error)
