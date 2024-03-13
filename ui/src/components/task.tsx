@@ -1,9 +1,8 @@
-import { Button, Checkbox, Typography } from '@mui/material'
+import { Button, Checkbox, CircularProgress, Typography } from '@mui/material'
 import { useContext, useState } from 'react'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import classNames from 'classnames'
-import axios from 'axios'
 import { UpdateTaskForm } from './update-task-form'
 import { TaskContext } from '../context'
 
@@ -17,18 +16,18 @@ export type TaskProps = {
 
 export const Task = ({ task }: TaskProps) => {
 	const { id, name, completed } = task
-
-	const { deleteTask } = useContext(TaskContext)
+	const { deleteTask, updateTaskCompletion } = useContext(TaskContext)
 
 	const [isComplete, setIsComplete] = useState(completed)
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
+	const [isLoading, setIsLoading] = useState(false)
 
 	const handleUpdateTaskCompletion = async () => {
 		try {
-			await axios.put(`${import.meta.env.VITE_API_URL}`, {
+			await updateTaskCompletion({
+				completed: isComplete,
 				id,
 				name,
-				completed: !isComplete,
 			})
 			setIsComplete(!isComplete)
 		} catch (error) {
@@ -37,11 +36,14 @@ export const Task = ({ task }: TaskProps) => {
 	}
 
 	const handleDeleteTask = async () => {
+		setIsLoading(true)
 		try {
 			await deleteTask(id)
 		} catch (error) {
+			setIsLoading(false)
 			console.error(error)
 		}
+		setIsLoading(false)
 	}
 
 	return (
@@ -55,8 +57,13 @@ export const Task = ({ task }: TaskProps) => {
 				<Button variant='contained' onClick={() => setIsDialogOpen(true)}>
 					<EditIcon />
 				</Button>
-				<Button color='error' variant='contained' onClick={handleDeleteTask}>
-					<DeleteIcon />
+				<Button
+					color='error'
+					variant='contained'
+					onClick={handleDeleteTask}
+					disabled={isLoading}
+				>
+					{isLoading ? <CircularProgress size={24} /> : <DeleteIcon />}
 				</Button>
 			</div>
 

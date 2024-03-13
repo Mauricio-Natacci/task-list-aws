@@ -1,4 +1,10 @@
-import { Button, Dialog, DialogTitle, TextField } from '@mui/material'
+import {
+	Button,
+	CircularProgress,
+	Dialog,
+	DialogTitle,
+	TextField,
+} from '@mui/material'
 import { useContext, useState } from 'react'
 import CheckIcon from '@mui/icons-material/Check'
 import { TaskProps } from './task'
@@ -17,20 +23,24 @@ export const UpdateTaskForm = ({
 }: UpdateTaskProps) => {
 	const { id, completed } = task
 	const [taskName, setTaskName] = useState('')
+	const [isLoading, setIsLoading] = useState(false)
 
-	const { updateTask } = useContext(TaskContext)
+	const { updateTaskName } = useContext(TaskContext)
 
 	const handleUpdateTaskName = async () => {
 		if (!taskName.length) return
 
+		setIsLoading(true)
 		try {
-			
-			await updateTask({ id, name: taskName, completed })
+			await updateTaskName({ id, name: taskName, completed })
 
 			setTaskName('')
 		} catch (error) {
+			setTaskName('')
+			setIsLoading(false)
 			console.error(error)
 		}
+		setIsLoading(false)
 	}
 
 	return (
@@ -51,8 +61,13 @@ export const UpdateTaskForm = ({
 
 						setIsDialogOpen(false)
 					}}
+					disabled={isLoading}
 				>
-					<CheckIcon />
+					{isLoading ? (
+						<CircularProgress size={24} color='warning' />
+					) : (
+						<CheckIcon />
+					)}
 				</Button>
 			</div>
 		</Dialog>

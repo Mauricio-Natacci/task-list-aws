@@ -23,10 +23,12 @@ type UpdateTask = {
   completed: boolean
 }
 
+
 export type TaskContextType = TaskState & {
 	loadTasks: () => Promise<void>
 	addTask: (input: AddTask) => Promise<void>
-  updateTask: (input: UpdateTask) => Promise<void>
+  updateTaskName: (input: UpdateTask) => Promise<void>
+  updateTaskCompletion(input: UpdateTask): Promise<void>
   deleteTask: (id: string) => Promise<void>
 }
 
@@ -35,7 +37,8 @@ export const TaskContext = createContext<TaskContextType>({
 	task: null,
 	loadTasks: async () => {},
 	addTask: async () => {},
-  updateTask: async () => {},
+  updateTaskName: async () => {},
+  updateTaskCompletion: async () => {},
   deleteTask: async () => {},
 })
 
@@ -80,7 +83,7 @@ export function TaskContextProvider(props: Props): JSX.Element {
 		}
 	}
 
-  const updateTask = async (input: UpdateTask) => {
+  const updateTaskName = async (input: UpdateTask) => {
     try {
       await axios.put(import.meta.env.VITE_API_URL, {
         id: input.id,
@@ -98,8 +101,26 @@ export function TaskContextProvider(props: Props): JSX.Element {
       console.error(error)
     }
   }
-  
 
+  const updateTaskCompletion = async (input: UpdateTask) => {
+    try {
+      await axios.put(import.meta.env.VITE_API_URL, {
+        id: input.id,
+        name: input.name,
+        completed: !input.completed,
+      })
+
+      const { data } = await axios.get(import.meta.env.VITE_API_URL)
+
+      setState((prevState) => ({
+        ...prevState,
+        tasks: data,
+      }))
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  
 	const deleteTask = async (id: string) => {
 		try {
 			await axios.delete(`${import.meta.env.VITE_API_URL}/${id}`)
@@ -121,7 +142,8 @@ export function TaskContextProvider(props: Props): JSX.Element {
 				...state,
 				loadTasks,
 				addTask,
-        updateTask,
+        updateTaskName,
+        updateTaskCompletion,
         deleteTask,
 			}}
 		>
