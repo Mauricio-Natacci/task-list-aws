@@ -23,8 +23,6 @@ export default function App() {
 	const fetchTasks = async () => {
 		try {
 			const { data } = await axios.get(import.meta.env.VITE_API_URL)
-			console.log('data', data)
-
 			setTasks(data)
 		} catch (error) {
 			console.error(error)
