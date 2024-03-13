@@ -21,6 +21,8 @@ export const UpdateTaskForm = ({
 	const [taskName, setTaskName] = useState('')
 
 	const handleUpdateTaskName = async () => {
+		if (!taskName.length) return
+
 		try {
 			await axios.put(`${import.meta.env.VITE_API_URL}`, {
 				id,
