@@ -8,8 +8,7 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 import crypto from 'crypto'
 
-const client = new DynamoDBClient({ region: 'us-east-1' })
-
+const client = new DynamoDBClient({ region: 'us-west-1' })
 const docClient = DynamoDBDocumentClient.from(client)
 
 export const fetchTasks = async () => {
@@ -24,7 +23,7 @@ export const fetchTasks = async () => {
 	return response
 }
 
-export const createTask = async ({ name, completed }) => {
+export const createTasks = async ({ name, completed }) => {
 	const uuid = crypto.randomUUID()
 	const command = new PutCommand({
 		TableName: 'Tasks',
@@ -37,17 +36,19 @@ export const createTask = async ({ name, completed }) => {
 
 	const response = await docClient.send(command)
 
-	console.log('response', response)
-
 	return response
 }
 
-export const updateTask = async ({ id, name, completed }) => {
+export const updateTasks = async ({ id, name, completed }) => {
 	const command = new UpdateCommand({
 		TableName: 'Tasks',
-		Key: { id },
-		UpdateExpression: 'set #name = :name, completed = :completed',
-		ExpressionAttributeNames: { '#name': 'name' },
+		Key: {
+			id,
+		},
+		ExpressionAttributeNames: {
+			'#name': 'name',
+		},
+		UpdateExpression: 'set #name = :n, completed = :c',
 		ExpressionAttributeValues: {
 			':n': name,
 			':c': completed,
@@ -55,14 +56,20 @@ export const updateTask = async ({ id, name, completed }) => {
 		ReturnValues: 'ALL_NEW',
 	})
 
-	return await docClient.send(command)
+	const response = await docClient.send(command)
+
+	return response
 }
 
-export const deleteTask = async (id) => {
+export const deleteTasks = async (id) => {
 	const command = new DeleteCommand({
 		TableName: 'Tasks',
-		Key: { id },
+		Key: {
+			id,
+		},
 	})
 
-	return await docClient.send(command)
+	const response = await docClient.send(command)
+
+	return response
 }
