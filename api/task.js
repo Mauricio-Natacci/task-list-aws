@@ -37,6 +37,8 @@ export const createTask = async ({ name, completed }) => {
 
 	const response = await docClient.send(command)
 
+	console.log('response', response)
+
 	return response
 }
 

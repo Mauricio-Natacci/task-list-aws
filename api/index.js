@@ -28,9 +28,11 @@ app.get('/task', async (req, res) => {
 
 app.post('/task', async (req, res) => {
 	try {
-		const tasks = await createTask()
+		const task = req.body
 
-		res.send(tasks.Items)
+		const response = await createTask(task)
+
+		res.send(response)
 	} catch (error) {
 		res.status(400).send(`Error creating tasks: ${error}`)
 	}
